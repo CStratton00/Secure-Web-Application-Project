@@ -1,4 +1,4 @@
-# Secure-Web-Application-Project
+# SecureWebApplicationProject
 ITT-305 Project to learn how to create a website and secure it
 
 Links about the creation of this project: 
