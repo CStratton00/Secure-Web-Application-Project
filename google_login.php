@@ -16,7 +16,11 @@ $db_password = "root";
 $host_name = "localhost";
 $db_name = 'test';
 
+
+$guzzle = new GuzzleHttp\Client(['verify'=>false]);
+
 $client = new Google_Client();
+$client->setHttpClient($guzzle);
 $client->setClientID($client_id);
 $client->setClientSecret($client_secret);
 $client->setRedirectUri($redirect_uri);
@@ -49,11 +53,13 @@ if(isset($authUrl)) {
   echo '<div align="center">';
   echo '<h3>Login</h3>';
   echo '<div>You will need a Google account to sign in.</div>';
+  echo '<a class="login" href="' .$authUrl . '">Login here</a>';
   echo '</div>';
 } else {
   $user = $service->userinfo->get();
 
   $mysqli = new mysqli($host_name, $db_username, $db_password, $db_name);
+
   if($mysqli->connect_error) {
     die('Error : (' . $mysqli->connect_errno .') ' . $mysqli->connect_error);
   }
