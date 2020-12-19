@@ -4,10 +4,10 @@
   ini_set('display_errors', 1);
   session_start();
 
-  // if(! $_SESSION['username']) {
-  //   echo "Only logged in users can add a joke. Click <a href='login_form.php' </a>here to login<br>";
-  //   exit;
-  // }
+  if(! $_SESSION['userid']) {
+    echo "Only logged in users can add a joke. Click <a href='google_login.php' </a>here to login<br>";
+    exit;
+  }
 
   include "db_connect.php";
   $newjokequestion = addslashes($_GET['newjoke']);

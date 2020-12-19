@@ -27,9 +27,12 @@
 
   echo "<h1>Show all jokes with the word: " . $_GET["keyword"] . "</h1>";
 
-  $res = $mysqli->query("SELECT google_users.google_name, Jokes_table.JokeID, Jokes_table.users_ID, Jokes_table.Joke_question, Jokes_table.Joke_answer FROM google_users INNER JOIN Jokes_table ON google_users.google_id = Jokes_table.users_ID WHERE Jokes_table.Joke_question LIKE $keywordfromform");
+  $sql = "SELECT JokeID, Joke_question, Joke_answer, users_ID, username, google_name FROM Jokes_table JOIN users on Jokes_table.users_ID = users.id";
+  $result = $mysqli->query($sql);
 
-  echo "Select returned $res->num_rows rows of data<br>";
+  // $res = $mysqli->query("SELECT google_users.google_name, Jokes_table.JokeID, Jokes_table.users_ID, Jokes_table.Joke_question, Jokes_table.Joke_answer FROM google_users INNER JOIN Jokes_table ON google_users.google_id = Jokes_table.users_ID WHERE Jokes_table.Joke_question LIKE $keywordfromform");
+  //
+  // echo "Select returned $res->num_rows rows of data<br>";
 
   // $stmt = $mysqli->prepare("SELECT JokeID, Joke_question, Joke_answer, users_ID, username FROM Jokes_table JOIN users ON users.ID = jokes_table.users_ID WHERE Joke_question LIKE ?");
   // $stmt->bind_param("s", $keywordfromform);
@@ -43,7 +46,7 @@
 
 <div class="panel-group" id="accordion">
 
-  <?php while($row = $res->fetch_assoc()) { ?>
+  <?php while($row = $result->fetch_assoc()) { ?>
 
     <div class="panel panel-default">
       <div class="panel-heading">

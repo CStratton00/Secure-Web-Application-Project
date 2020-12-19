@@ -19,6 +19,9 @@
 
     <?php
 
+      $redirect_uri = 'http://localhost:8888/Jokes_Website/google_login.php';
+      echo "<p><a href='" .$redirect_uri. "?logout=1'>Log Out</a></p>";
+
       // Connect
 
       include "db_connect.php";

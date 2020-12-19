@@ -15,6 +15,7 @@ $db_username = "root";
 $db_password = "root";
 $host_name = "localhost";
 $db_name = 'test';
+$port = 8888;
 
 
 $guzzle = new GuzzleHttp\Client(['verify'=>false]);
@@ -51,40 +52,92 @@ if(isset($_SESSION['access_token']) && $_SESSION['access_token']) {
 echo '<div style="margin:20px">';
 if(isset($authUrl)) {
   echo '<div align="center">';
-  echo '<h3>Login</h3>';
-  echo '<div>You will need a Google account to sign in.</div>';
+  echo '<h1>Login</h1>';
+  echo '<p>You will need a Google account to sign in.</p>';
   echo '<a class="login" href="' .$authUrl . '">Login here</a>';
   echo '</div>';
+  exit;
 } else {
   $user = $service->userinfo->get();
 
-  $mysqli = new mysqli($host_name, $db_username, $db_password, $db_name);
+  $mysqli = new mysqli($host_name, $db_username, $db_password, $db_name, $port);
 
   if($mysqli->connect_error) {
     die('Error : (' . $mysqli->connect_errno .') ' . $mysqli->connect_error);
   }
 
-  $result = $mysqli->query("SELECT COUNT(google_id) as usercount FROM google_users WHERE google_id = $user->id");
-  $user_count = $result->fetch_object()->usercount;
+  $stmt = $mysqli->prepare("SELECT id, username, password, google_id, google_name, google_email, google_picture_link FROM users WHERE google_id=?");
+  $stmt->bind_param("s", $user->id);
+  $stmt->execute();
+  $stmt->store_result();
+  $stmt->bind_result($userid, $username, $password, $google_id, $google_name, $google_email, $google_picture_link);
 
-  echo '<img src="' .$user->picture. '" style="float: right;margin-top: 33px" />';
+  if($stmt->num_rows > 0) {
+    echo "<h2>Welcome back " .$user->name. "!</h2>";
+    echo "<p><a href='" .$redirect_uri. "?logout=1'>Log Out</a></p>";
+    echo "<p><a href='index.php'>Go to main page</a></p>";
 
-  if($user_count) {
-    echo 'Welcome back ' . $$user->name . '! [<a href="' . $redirect_uri . '?logout=1">Log Out</a>]';
+    while($stmt->fetch()) {
+      echo "According to the database records, you are:<br>";
+      echo "<br>userid = " . $userid;
+      echo "<br>username = " . $username;
+      echo "<br>password = " . $password;
+      echo "<br>google_id = " . $google_id;
+      echo "<br>google_name = " . $google_name;
+      echo "<br>google_email = " . $google_email;
+      echo "<br>google_picture_link = " . $google_picture_link;
+    }
+
+    $_SESSION['username']=$user->name;
+    $_SESSION['googleuserid']=$user->id;
+    $_SESSION['useremail']=$user->email;
+    $_SESSION['userid']=$userid;
   } else {
-    echo 'Hi ' . $user->name . ', Thanks for Registering! [<a href="' . $redirect_uri . '?logout=1">Log Out</a>]';
-    $statement = $mysqli->prepare("INSERT INTO google_users (google_id, google_name, google_email, google_link, google_picture_link) VALUES (?,?,?,?,?)");
-    $statement->bind_param('issss'. $user->id, $user->email, $user->link, $user->picture);
+    echo "<h2>Welcome " . $user->name . "! Thanks for Registering!!</h2>";
+
+    $statement = $mysqli->prepare("INSERT INTO users(google_id, google_name, google_email, google_picture_link) VALUES(?,?,?,?)");
+    $statement->bind_param('ssss', $user->id, $user->name, $user->email, $user->picture);
+
     $statement->execute();
+    $newuserid = $statement->insert_id;
     echo $mysqli->error;
+    echo "<p>Created new user:</p>";
+
+    echo "New user id = " . $newuserid . "<br>";
+    echo "<br>google_id = " . $user->id;
+    echo "<br>google_name = " . $user->name;
+    echo "<br>google_email = " . $user->email;
+    echo "<br>google_picture_link = " . $user->picutre;
+
+    $_SESSION['username']=$user->name;
+    $_SESSION['googleuserid']=$user->id;
+    $_SESSION['useremail']=$user->email;
+    $_SESSION['userid']=$newuserid;
   }
 
-  echo "<p>Data about this user. <ul><li>Username: " . $user->name . "</li> <li>user id: " . $user->id . "</li> <li>email: " . $user->email . "</li></ul></p>";
+  echo "<p>About this user</p>";
+  echo "<url>";
+  echo "<img src='" .$user->picture. "'/>";
+  echo "<li>Username: " .$user->name. "</li>";
+  echo "<li>User ID: " .$_SESSION['userid']. "</li>";
+  echo "<li>User Email: " .$user->email. "</li>";
+  echo "</url>";
+  echo "<a href='index.php'>Return to main page</a>";
 
-  $_SESSION['username']=$user->name;
-  $_SESSION['userid']=$user->id;
-  $_SESSION['useremail']=$user->email;
+  echo "<br>Session values = <br>";
+  echo "<pre>";
+  print_r($_SESSION);
+  echo "</pre>";
 
 }
 echo '</div>';
  ?>
+
+ <style>
+ body {
+   font_family: "helvetica";
+ }
+ img {
+   height:100px;
+ }
+ </style>
