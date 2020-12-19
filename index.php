@@ -13,11 +13,14 @@
 
   <body>
     <h1>Jokes Page</h1>
-    <a href="logout.php">Click here to log out<a>
+    <!-- <a href="logout.php">Click here to log out<a>
     <a href="login_form.php">Click here to login<a>
-    <a href="register_new_user.php">Click here to register<a><br>
+    <a href="register_new_user.php">Click here to register<a><br> -->
 
     <?php
+
+      $redirect_uri = 'http://localhost:8888/Jokes_Website/google_login.php';
+      echo "<p><a href='" .$redirect_uri. "?logout=1'>Log Out</a></p>";
 
       // Connect
 
@@ -53,8 +56,15 @@
       </form>
 
 
+      <?php
+
+      session_start();
+      if(isset($_SESSION['userid'])):
+
+       ?>
+
       <hr>
-      <form class="form-horizontal" action="add_joke.php">
+      <form action="add_joke.php" method="get" class="form-horizontal">
         <fieldset>
 
         <!-- Form Name -->
@@ -89,6 +99,15 @@
         </fieldset>
       </form>
 
+    <?php else: ?>
+
+      <div align="center">
+        <h3>Login</h3>
+        <div>You will need a Google account to add a new joke.</div>
+        <a href="google_login.php">Login here</a>
+      </div>
+
+    <?php endif; ?>
 
       <?php
 
