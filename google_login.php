@@ -7,9 +7,9 @@ session_start();
 
 require_once('vendor/autoload.php');
 
-$client_id = '775891253213-gd1lgfa4q3ajnt2e1lm6hlircgiq2rsv.apps.googleusercontent.com';
-$client_secret = 'AQD_r_9XeW3dec-AbeBAQx1Y';
-$redirect_uri = 'http://localhost:8888/Jokes_Website/google_login.php';
+$client_id = '';
+$client_secret = '';
+$redirect_uri = '';
 
 $db_username = "root";
 $db_password = "root";
